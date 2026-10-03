@@ -1015,15 +1015,17 @@ function enterMainPage() {
     updateMusicButtonUI();
   }
 
-  // Inisialisasi semua modul halaman utama
+  // Inisialisasi semua modul halaman utama terlebih dahulu
   initScrollProgressBar();
-  initScrollReveal();
   initCakeCandles();
   initDigitalBouquet();
   initPhotoMemories();
   initTimeline();
   initGratefulJar();
   initPenutupSurprise();
+
+  // Inisialisasi scroll reveal SETELAH semua kartu (foto & timeline) terpasang di DOM
+  initScrollReveal();
 
   // Scroll ke paling atas hero
   window.scrollTo({ top: 0, behavior: 'instant' });
@@ -1051,19 +1053,43 @@ function initScrollReveal() {
     return;
   }
 
-  const observer = new IntersectionObserver((entries) => {
+  if (window.scrollObserver) {
+    window.scrollObserver.disconnect();
+  }
+
+  window.scrollObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
+        window.scrollObserver.unobserve(entry.target);
       }
     });
   }, {
-    threshold: 0.15,
-    rootMargin: '0px 0px -40px 0px'
+    threshold: 0.05,
+    rootMargin: '50px 0px 50px 0px'
   });
 
-  reveals.forEach(el => observer.observe(el));
+  reveals.forEach(el => window.scrollObserver.observe(el));
+
+  // Fallback scroll listener untuk memastikan kartu selalu muncul di mobile/hosting webview
+  window.removeEventListener('scroll', checkFallbackReveals);
+  window.addEventListener('scroll', checkFallbackReveals, { passive: true });
+  checkFallbackReveals();
+}
+
+function checkFallbackReveals() {
+  const unrevealed = document.querySelectorAll('.reveal:not(.visible)');
+  if (unrevealed.length === 0) return;
+  const windowH = window.innerHeight;
+  unrevealed.forEach(el => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < windowH - 10 && rect.bottom > 0) {
+      el.classList.add('visible');
+      if (window.scrollObserver) {
+        window.scrollObserver.unobserve(el);
+      }
+    }
+  });
 }
 
 // ==========================================================================
@@ -1205,9 +1231,9 @@ function initPhotoMemories() {
     card.setAttribute('tabindex', '0');
     card.setAttribute('aria-label', `Foto kenangan ${index + 1}: ${item.caption}`);
 
-    // Fallback onerror jika file belum ada
+    // Fallback onerror jika file belum ada atau beda ekstensi (.jpeg vs .jpg)
     card.innerHTML = `
-      <img src="${item.src}" alt="${item.caption}" class="photo-img" loading="lazy" onerror="this.onerror=null; this.parentElement.querySelector('.photo-fallback').classList.remove('hidden'); this.style.display='none';">
+      <img src="${item.src}" alt="${item.caption}" class="photo-img" loading="lazy" onerror="if (!this.dataset.triedJpg && this.src.includes('.jpeg')) { this.dataset.triedJpg = '1'; this.src = this.src.replace(/\\.jpeg$/i, '.jpg'); } else { this.onerror=null; this.parentElement.querySelector('.photo-fallback').classList.remove('hidden'); this.style.display='none'; }">
       <div class="photo-fallback hidden" aria-hidden="true">
         <span>📷</span>
         <p>Kenangan Kita</p>
@@ -1240,6 +1266,9 @@ function initPhotoMemories() {
     });
 
     photoGrid.appendChild(card);
+    if (window.scrollObserver) {
+      window.scrollObserver.observe(card);
+    }
   });
 
   // Lightbox handlers
@@ -1342,6 +1371,9 @@ function initTimeline() {
     `;
 
     timelineList.appendChild(el);
+    if (window.scrollObserver) {
+      window.scrollObserver.observe(el);
+    }
   });
 
   // Track scroll progress pada timeline
