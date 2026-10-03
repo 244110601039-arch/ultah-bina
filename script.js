@@ -269,7 +269,7 @@ function playMusic() {
   updateMusicButtonUI();
 
   if (bgm) {
-    bgm.volume = CONFIG.musicVolume !== undefined ? CONFIG.musicVolume : 0.1;
+    bgm.volume = CONFIG.musicVolume !== undefined ? CONFIG.musicVolume : 0.01;
 
     try {
       if (!bgm.paused) return;
