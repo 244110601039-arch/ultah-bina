@@ -637,16 +637,16 @@
         <div class="thanks-card glass-card reveal">
           <p class="thanks-p">
             "Aku tau website ini mungkin bukan sesuatu yang bisa kamu rasain secara fisik.
-            Tapi ya... aku pengen kasih sesuatu yang bukan cuma beli, kasih, terus selesai.
-            Aku pengen bikin sesuatu yang bisa kamu buka lagi kapan-kapan,
-            biar nanti kalau kamu kangen atau cuma lagi pengen lihat-lihat, kamu bisa balik ke sini lagi."
+            <br>Tapi ya... aku pengen kasih sesuatu yang bukan cuma beli, kasih, terus selesai.
+            <br>Aku pengen bikin sesuatu yang bisa kamu buka lagi kapan-kapan,
+            <br>biar nanti kalau kamu kangen atau cuma lagi pengen lihat-lihat, kamu bisa balik ke sini lagi."
           </p>
           <p class="thanks-p">
             "Happy birthday, Bina. Semoga tahun ini jadi a really good year for u.
-            Semoga lebih banyak ketawa daripada nangis, lebih banyak good news
-            daripada hal-hal yang bikin kamu kepikiran.
-            Dan semoga ke depannya aku masih bisa jadi bagian dari cerita kamu,
-            nemenin kamu di banyak momen lagi.
+            <br>Semoga lebih banyak ketawa daripada nangis, lebih banyak good news
+            <br>daripada hal-hal yang bikin kamu kepikiran.
+            <br>Dan semoga ke depannya aku masih bisa jadi bagian dari cerita kamu,
+            <br>nemenin kamu di banyak momen lagi.
             <br>I love you, more than you know. ❤️"
           </p>
         </div>
@@ -686,24 +686,6 @@
         <h2 class="celeb-line celeb-line-1" id="celeb-line-1">I love you, Shabrina 💖</h2>
         <h3 class="celeb-line celeb-line-2" id="celeb-line-2">Nafis</h3>
         <p class="celeb-line celeb-line-3" id="celeb-line-3">Selamat ulang tahun, kapal selamku 🚢💗</p>
-
-        <!-- Special Portfolio Gift Card & Link -->
-        <div class="celeb-gift-card celeb-line celeb-line-4" id="celeb-line-4">
-          <div class="celeb-gift-divider"></div>
-          <div class="celeb-gift-badge">
-            <span class="gift-icon">🎁</span>
-            <span>HADIAH SPESIAL DARI AKU</span>
-          </div>
-          <p class="celeb-gift-note">
-            Aku bikinin website portofolio resmi khusus buat kamu, buat nemenin setiap langkah, karya, dan dedikasi
-            hebat kamu ke depan ✨
-          </p>
-          <a href="https://shabrinaputrijohani.vercel.app/" target="_blank" rel="noopener noreferrer"
-            class="celeb-gift-btn" id="celeb-gift-link">
-            <span class="gift-btn-text">Buka Website Portofolio Kamu</span>
-            <span class="gift-btn-arrow">↗</span>
-          </a>
-        </div>
       </div>
     </div>
   </div>

@@ -1602,7 +1602,6 @@ function initPenutupSurprise() {
   const line1 = document.getElementById('celeb-line-1');
   const line2 = document.getElementById('celeb-line-2');
   const line3 = document.getElementById('celeb-line-3');
-  const line4 = document.getElementById('celeb-line-4');
 
   // Ganti [NAMA KAMU] pada tanda tangan surat dan modal penutup
   const letterSign = document.getElementById('letter-signature');
@@ -1623,7 +1622,6 @@ function initPenutupSurprise() {
       setTimeout(() => { if (line1) line1.classList.add('celeb-show'); }, 300);
       setTimeout(() => { if (line2) line2.classList.add('celeb-show'); }, 1100);
       setTimeout(() => { if (line3) line3.classList.add('celeb-show'); }, 1900);
-      setTimeout(() => { if (line4) line4.classList.add('celeb-show'); }, 2600);
     });
   }
 
@@ -1632,7 +1630,6 @@ function initPenutupSurprise() {
     if (line1) line1.classList.remove('celeb-show');
     if (line2) line2.classList.remove('celeb-show');
     if (line3) line3.classList.remove('celeb-show');
-    if (line4) line4.classList.remove('celeb-show');
   }
 
   if (celebrationClose) celebrationClose.addEventListener('click', closeCelebration);
