@@ -17,6 +17,7 @@ const CONFIG = {
   tanggalUlangtaunLabel: "04 OKTOBER",
   password: "041004", // Format HHBBTT (04 Oktober 2004)
   durasiLoading: 3800, // milidetik (3.8 detik)
+  musicVolume: 0.3, // Volume musik latar (0.0 - 1.0, disetel 0.3 agar suaranya lembut dan tidak terlalu keras)
 
   // Pesan Digital Bouquet (5 Bunga: Tulip, Mawar, Matahari, Buket, Anggrek/Hibiscus)
   bouquetMessages: [
@@ -176,6 +177,9 @@ window.resetSession = function () {
 // AUDIO SYSTEM (BGM + WEBAUDIO ROMANTIC SYNTH MELODY AS FALLBACK)
 // ==========================================================================
 const bgm = document.getElementById('bgm');
+if (bgm) {
+  bgm.volume = CONFIG.musicVolume !== undefined ? CONFIG.musicVolume : 0.3;
+}
 const musicBtn = document.getElementById('music-btn');
 let synthAudioCtx = null;
 let synthInterval = null;
@@ -264,13 +268,11 @@ function playMusic() {
   state.isMusicPlaying = true;
   updateMusicButtonUI();
 
-  // Cek apakah ada file music.mp3 asli yang valid (durasi > 2s)
-  // File 165 byte dummy memiliki durasi NaN, 0, atau kurang dari 2 detik
-  const hasRealMp3 = bgm && !isNaN(bgm.duration) && bgm.duration > 2;
+  if (bgm) {
+    bgm.volume = CONFIG.musicVolume !== undefined ? CONFIG.musicVolume : 0.3;
 
-  if (hasRealMp3) {
     try {
-      if (bgm && !bgm.paused) return;
+      if (!bgm.paused) return;
       const playPromise = bgm.play();
       if (playPromise !== undefined) {
         playPromise
@@ -285,7 +287,6 @@ function playMusic() {
       startRomanticSynthMusic();
     }
   } else {
-    // File music.mp3 adalah placeholder -> langsung gunakan synth romantis
     startRomanticSynthMusic();
   }
 }
