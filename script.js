@@ -125,7 +125,7 @@ const CONFIG = {
       text: "Aku senang punya kamu yang bisa dengerin cerita aku, termasuk waktu aku lagi bingung atau banyak pikiran. Kadang aku cuma butuh didengerin, dan kamu ada di situ."
     },
     {
-      emoji: "🍜",
+      emoji: "💧",
       text: "Aku suka hal-hal kecil yang kita lakuin bareng. call, chatan, saling pap atau sekadar nanya \"udah minum belum?\"(beneran nanya)."
     },
     {
