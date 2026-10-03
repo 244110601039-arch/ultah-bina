@@ -33,7 +33,7 @@ const CONFIG = {
     {
       emoji: "🌻",
       label: "🌻 KECERIAAN",
-      text: "Kadang hari aku biasa aja, kadang juga lagi gak enak. Tapi kalau ngeliat pap kamu, pasti jadi lebih enak. Literally Sesimpel itu."
+      text: "Kadang, hari aku biasa aja, kadang juga lagi gak enak. Tapi kalau ngeliat pap kamu, pasti jadi lebih enak. Literally Sesimpel itu."
     },
     {
       emoji: "💐",
@@ -99,7 +99,7 @@ const CONFIG = {
       emoji: "📸",
       title: "Mulai Renggang & balikan",
       subtitle: "aku ngerasa ragu dan mulai renggang",
-      desc: "sebenernya salah aku si, soalnya aku yang mulai duluan buat renggang, tapi akhirnya aku balik lagi soalnya ga kuat (ternyata kmu dah ngedet sama cowo lain)"
+      desc: "sebenernya salah aku si, soalnya aku yang mulai duluan buat renggang, tapi akhirnya aku balik lagi (ternyata kmu dah ngedet sama cowo lain)"
     },
     {
       emoji: "🌅",
@@ -110,7 +110,7 @@ const CONFIG = {
     }
   ],
 
-  // 8 Catatan Rasa Syukur (Reasons I'm Grateful To Know You)
+  // 6 Catatan Rasa Syukur (Reasons I'm Grateful To Know You)
   jarNotes: [
     {
       emoji: "💫",
@@ -118,7 +118,7 @@ const CONFIG = {
     },
     {
       emoji: "🌷",
-      text: "Makasih karena kamu masih sabar sama aku, termasuk pas aku lagi keras kepala, banyak mikir, atau kadang susah diajak ngobrol. Aku tau itu gak gampang."
+      text: "Makasih karena kamu masih sabar sama aku, termasuk pas aku lagi banyak mikir, atau kadang susah diajak ngobrol. Aku tau itu gak gampang."
     },
     {
       emoji: "🤝",
@@ -129,16 +129,8 @@ const CONFIG = {
       text: "Aku suka hal-hal kecil yang kita lakuin bareng. call, chatan, saling pap atau sekadar nanya \"udah minum belum?\"(beneran nanya)."
     },
     {
-      emoji: "🌙",
-      text: "Aku bersyukur kamu bisa dengerin aku tanpa bikin aku merasa aneh karena cerita ini itu. Rasanya nyaman punya tempat buat cerita."
-    },
-    {
       emoji: "☀️",
       text: "Aku gak tau kamu sadar atau gak, tapi foto kamu emang punya efek aneh ke aku. Lagi cape atau bad mood, liat wpp kamu aja langsung good mood."
-    },
-    {
-      emoji: "🧸",
-      text: "Sama kamu aku nggak harus selalu kelihatan baik-baik aja. Aku bisa cerita kalau lagi capek, bingung, atau lagi nggak tahu harus gimana."
     },
     {
       emoji: "💖",
@@ -159,7 +151,7 @@ const state = {
   candlesBlown: [false, false, false],
   currentPhotoIndex: 0,
   revealedPhotos: new Set(),
-  remainingJarIndices: [0, 1, 2, 3, 4, 5, 6, 7],
+  remainingJarIndices: [0, 1, 2, 3, 4, 5],
   drawnJarCount: 0,
   isJarShaking: false,
   audioInitiated: false
@@ -1494,15 +1486,30 @@ function initGratefulJar() {
   btnJarShake.addEventListener('click', () => {
     if (state.isJarShaking) return;
 
+    const totalNotes = CONFIG.jarNotes.length;
+
     // Cek apakah semua catatan sudah terambil
     if (state.remainingJarIndices.length === 0) {
       // Tombol reset/mulai lagi
-      state.remainingJarIndices = [0, 1, 2, 3, 4, 5, 6, 7];
+      state.remainingJarIndices = CONFIG.jarNotes.map((_, i) => i);
       state.drawnJarCount = 0;
       btnJarShake.textContent = "📒 Kocok toplesnya";
       jarNoteIcon.textContent = "✨";
       jarNoteText.textContent = "Toples telah diisi kembali dengan alasan-alasan indah. Kocok lagi!";
       jarNoteFooter.textContent = "SIAP MENGAMBIL CATATAN";
+
+      // Kembalikan semua kertas di dalam toples
+      if (jarGraphic) {
+        const jarPapers = jarGraphic.querySelectorAll('.jar-paper');
+        jarPapers.forEach(p => {
+          p.style.opacity = '1';
+          p.style.transform = '';
+        });
+      }
+
+      // Bersihkan pesan selesai jika ada
+      const existingNotice = jarNoteCard.querySelector('.jar-all-done-notice');
+      if (existingNotice) existingNotice.remove();
       return;
     }
 
@@ -1510,20 +1517,33 @@ function initGratefulJar() {
     btnJarShake.disabled = true;
 
     // 1. Toples bergetar 0.8s
-    jarGraphic.classList.add('shaking');
+    if (jarGraphic) {
+      jarGraphic.classList.add('shaking');
+    }
 
-    // 2. Kertas terbang keluar
+    // 2. Kertas terbang keluar & sembunyikan 1 kertas dari toples
     setTimeout(() => {
       if (flyingNote) {
         flyingNote.classList.remove('animating');
         void flyingNote.offsetWidth; // trigger reflow
         flyingNote.classList.add('animating');
       }
+
+      if (jarGraphic) {
+        const jarPapers = jarGraphic.querySelectorAll('.jar-paper');
+        const paperIdxToHide = jarPapers.length - 1 - state.drawnJarCount;
+        if (jarPapers[paperIdxToHide]) {
+          jarPapers[paperIdxToHide].style.opacity = '0';
+          jarPapers[paperIdxToHide].style.transform = 'scale(0.3) translateY(-15px)';
+        }
+      }
     }, 300);
 
     // 3. Tampilkan card catatan baru
     setTimeout(() => {
-      jarGraphic.classList.remove('shaking');
+      if (jarGraphic) {
+        jarGraphic.classList.remove('shaking');
+      }
 
       // Ambil indeks acak tanpa perulangan
       const randomIdxPos = Math.floor(Math.random() * state.remainingJarIndices.length);
@@ -1539,15 +1559,20 @@ function initGratefulJar() {
       setTimeout(() => {
         jarNoteIcon.textContent = note.emoji;
         jarNoteText.textContent = `"${note.text}"`;
-        jarNoteFooter.textContent = `CATATAN ${state.drawnJarCount} DARI 8`;
+        jarNoteFooter.textContent = `CATATAN ${state.drawnJarCount} DARI ${totalNotes}`;
+
+        // Hapus notice selesai sebelumnya jika ada
+        const existingNotice = jarNoteCard.querySelector('.jar-all-done-notice');
+        if (existingNotice) existingNotice.remove();
 
         jarNoteCard.style.opacity = '1';
         jarNoteCard.style.transform = 'translateY(0)';
 
-        // Jika sudah 8 catatan habis
+        // Jika semua catatan sudah habis
         if (state.remainingJarIndices.length === 0) {
           btnJarShake.textContent = "🔄 Mulai lagi dari awal";
           const allDoneNotice = document.createElement('div');
+          allDoneNotice.className = 'jar-all-done-notice';
           allDoneNotice.style.marginTop = '10px';
           allDoneNotice.style.fontSize = '0.85rem';
           allDoneNotice.style.color = 'var(--color-pink-soft)';

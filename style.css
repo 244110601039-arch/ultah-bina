@@ -1928,7 +1928,7 @@ button:focus-visible, a:focus-visible {
   height: 22px;
   border-radius: 3px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease;
+  transition: transform 0.4s ease, opacity 0.4s ease;
 }
 
 .p-mint { background: #b8f2e6; }
@@ -1937,12 +1937,12 @@ button:focus-visible, a:focus-visible {
 .p-blue { background: #cce3ff; }
 .p-purple { background: #e8d7ff; }
 
-.p-pos-1 { bottom: 12px; left: 16px; transform: rotate(15deg); }
-.p-pos-2 { bottom: 18px; left: 52px; transform: rotate(-22deg); }
-.p-pos-3 { bottom: 14px; right: 18px; transform: rotate(35deg); }
-.p-pos-4 { bottom: 38px; left: 24px; transform: rotate(-10deg); }
-.p-pos-5 { bottom: 44px; left: 62px; transform: rotate(18deg); }
-.p-pos-6 { bottom: 40px; right: 22px; transform: rotate(-28deg); }
+.p-pos-1 { bottom: 14px; left: 18px; transform: rotate(15deg); }
+.p-pos-2 { bottom: 18px; left: 52px; transform: rotate(-20deg); }
+.p-pos-3 { bottom: 14px; right: 18px; transform: rotate(30deg); }
+.p-pos-4 { bottom: 38px; left: 26px; transform: rotate(-12deg); }
+.p-pos-5 { bottom: 42px; right: 26px; transform: rotate(18deg); }
+.p-pos-6 { bottom: 62px; left: 52px; transform: rotate(-8deg); }
 .p-pos-7 { bottom: 70px; left: 32px; transform: rotate(26deg); }
 .p-pos-8 { bottom: 72px; right: 38px; transform: rotate(-14deg); }
 .p-pos-9 { bottom: 96px; left: 50px; transform: rotate(8deg); }
