@@ -17,7 +17,7 @@ const CONFIG = {
   tanggalUlangtaunLabel: "04 OKTOBER",
   password: "041004", // Format HHBBTT (04 Oktober 2004)
   durasiLoading: 3800, // milidetik (3.8 detik)
-  musicVolume: 0.1, // Volume musik latar (0.0 - 1.0, disetel 0.3 agar suaranya lembut dan tidak terlalu keras)
+  musicVolume: 0.01, // Volume musik latar (0.0 - 1.0, disetel 0.3 agar suaranya lembut dan tidak terlalu keras)
 
   // Pesan Digital Bouquet (5 Bunga: Tulip, Mawar, Matahari, Buket, Anggrek/Hibiscus)
   bouquetMessages: [
