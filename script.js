@@ -224,7 +224,7 @@ const globalAudioUnlock = () => {
  */
 function showIosSilentTip() {
   if (iosTipShown) return;
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   if (!isIOS) return;
 
@@ -1313,7 +1313,7 @@ function initPhotoMemories() {
       </div>
       <div class="photo-overlay">
         <span class="cam-icon" aria-hidden="true">📷</span>
-        <span class="overlay-text">Ketuk untuk mengungkap</span>
+        <span class="overlay-text">pencet dongg</span>
       </div>
       <div class="photo-caption-bar">${item.caption}</div>
     `;
