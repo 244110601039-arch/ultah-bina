@@ -1448,7 +1448,7 @@ button:focus-visible, a:focus-visible {
 
 .photo-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
   width: 100%;
   max-width: 600px;
@@ -1456,7 +1456,7 @@ button:focus-visible, a:focus-visible {
 
 @media (min-width: 768px) {
   .photo-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     max-width: 780px;
     gap: 20px;
   }
@@ -1464,17 +1464,31 @@ button:focus-visible, a:focus-visible {
 
 .photo-card {
   position: relative;
+  width: 100%;
   aspect-ratio: 3 / 4;
+  min-height: 200px;
   border-radius: var(--radius-md);
   overflow: hidden;
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);
   cursor: pointer;
   background: #2b0b1a;
-  transform: translateZ(0);
+  display: block;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Spacer agar di iPhone Safari tinggi kartu tidak pernah 0 / tumpang tindih */
+.photo-card::before {
+  content: '';
+  display: block;
+  padding-top: 133.33%;
 }
 
 .photo-img {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -1546,6 +1560,8 @@ button:focus-visible, a:focus-visible {
 
 /* Fallback gradient if photo fails to load */
 .photo-fallback {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   background: linear-gradient(135deg, #441328, #2a0a1a);
@@ -2232,6 +2248,38 @@ button:focus-visible, a:focus-visible {
 .celeb-show {
   opacity: 1 !important;
   transform: translateY(0) !important;
+}
+
+/* Toast notifikasi hening khusus iPhone */
+#ios-silent-tip {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 16px) + 12px);
+  left: 50%;
+  transform: translate(-50%, -100px);
+  max-width: 90vw;
+  width: 360px;
+  background: rgba(30, 8, 20, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(249, 168, 192, 0.4);
+  color: #ffffff;
+  padding: 10px 16px;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  line-height: 1.35;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 16px rgba(232, 102, 139, 0.3);
+  z-index: 99999;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+}
+
+#ios-silent-tip.show {
+  transform: translate(-50%, 0);
+  opacity: 1;
 }
 
 /* --------------------------------------------------------------------------

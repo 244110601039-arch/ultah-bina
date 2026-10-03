@@ -187,59 +187,113 @@ const bgm = document.getElementById('bgm');
 const musicBtn = document.getElementById('music-btn');
 let synthAudioCtx = null;
 let synthInterval = null;
+let iosTipShown = false;
+
+/**
+ * Melepas kunci audio iOS Safari secara sinkron saat ada sentuhan pengguna pertama kali
+ */
+function unlockAudioContextSync() {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    if (!synthAudioCtx) {
+      synthAudioCtx = new AudioContext();
+    }
+    if (synthAudioCtx.state === 'suspended') {
+      synthAudioCtx.resume();
+    }
+    // Mainkan buffer hening 1 sample untuk membuka blokir autoplay di iOS
+    const buffer = synthAudioCtx.createBuffer(1, 1, 22050);
+    const source = synthAudioCtx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(synthAudioCtx.destination);
+    source.start(0);
+  } catch (e) { }
+}
+
+// Buka kunci audio sesegera mungkin saat pengguna pertama kali menyentuh layar
+const globalAudioUnlock = () => {
+  unlockAudioContextSync();
+};
+['touchstart', 'touchend', 'click'].forEach(evtName => {
+  document.addEventListener(evtName, globalAudioUnlock, { capture: true, passive: true });
+});
+
+/**
+ * Tampilkan petunjuk hening ramah khusus iPhone jika pengguna berada di iOS
+ */
+function showIosSilentTip() {
+  if (iosTipShown) return;
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (!isIOS) return;
+
+  iosTipShown = true;
+  let tip = document.getElementById('ios-silent-tip');
+  if (!tip) {
+    tip = document.createElement('div');
+    tip.id = 'ios-silent-tip';
+    tip.innerHTML = '🔔 <span>Di iPhone, pastikan tombol hening/silent di samping bodi HP tidak aktif agar suara terdengar ya 💗</span>';
+    document.body.appendChild(tip);
+  }
+
+  tip.classList.add('show');
+  setTimeout(() => {
+    tip.classList.remove('show');
+  }, 4500);
+}
 
 /**
  * Memutar musik otomatis setelah interaksi pertama
  */
 function attemptPlayMusic() {
+  unlockAudioContextSync();
   if (state.audioInitiated) return;
   state.audioInitiated = true;
-
-  try {
-    if (bgm) {
-      const playPromise = bgm.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            state.isMusicPlaying = true;
-            updateMusicButtonUI();
-          })
-          .catch(() => {
-            // Jika browser memblokir audio atau file kosong, siapkan Web Audio synth fallback
-            startRomanticSynthMusic();
-            state.isMusicPlaying = true;
-            updateMusicButtonUI();
-          });
-      }
-    }
-  } catch (e) {
-    // Tangani error tanpa mengganggu console
-    startRomanticSynthMusic();
-  }
+  playMusic();
+  showIosSilentTip();
 }
 
 /**
  * Toggle play / pause musik
  */
 function toggleMusic() {
+  unlockAudioContextSync();
   if (state.isMusicPlaying) {
     pauseMusic();
   } else {
     playMusic();
+    showIosSilentTip();
   }
 }
 
 function playMusic() {
+  unlockAudioContextSync();
   state.isMusicPlaying = true;
   updateMusicButtonUI();
-  try {
-    if (bgm && !bgm.paused) return;
-    if (bgm) {
-      bgm.play().catch(() => {
-        startRomanticSynthMusic();
-      });
+
+  // Cek apakah ada file music.mp3 asli yang valid (durasi > 2s)
+  // File 165 byte dummy memiliki durasi NaN, 0, atau kurang dari 2 detik
+  const hasRealMp3 = bgm && !isNaN(bgm.duration) && bgm.duration > 2;
+
+  if (hasRealMp3) {
+    try {
+      if (bgm && !bgm.paused) return;
+      const playPromise = bgm.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            stopRomanticSynthMusic();
+          })
+          .catch(() => {
+            startRomanticSynthMusic();
+          });
+      }
+    } catch (e) {
+      startRomanticSynthMusic();
     }
-  } catch (e) {
+  } else {
+    // File music.mp3 adalah placeholder -> langsung gunakan synth romantis
     startRomanticSynthMusic();
   }
 }
@@ -265,16 +319,14 @@ function updateMusicButtonUI() {
 }
 
 /**
- * Generator nada lembut romantic piano chime menggunakan Web Audio API
- * Berjalan otomatis jika file music.mp3 adalah placeholder
+ * Generator nada lembut romantic music box chime menggunakan Web Audio API
+ * Berjalan otomatis di iPhone & Android tanpa memerlukan file eksternal
  */
 function startRomanticSynthMusic() {
   if (synthInterval) return;
   try {
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContext) return;
-    if (!synthAudioCtx) synthAudioCtx = new AudioContext();
-    if (synthAudioCtx.state === 'suspended') synthAudioCtx.resume();
+    unlockAudioContextSync();
+    if (!synthAudioCtx) return;
 
     // Notasi melodi romantis lembut (pentatonic C major / A minor: C4, E4, G4, A4, B4, C5, D5, E5)
     const melody = [
@@ -301,19 +353,40 @@ function stopRomanticSynthMusic() {
 function playSoftNote(freq) {
   if (!synthAudioCtx) return;
   try {
-    const osc = synthAudioCtx.createOscillator();
-    const gain = synthAudioCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(freq, synthAudioCtx.currentTime);
+    if (synthAudioCtx.state === 'suspended') {
+      synthAudioCtx.resume();
+    }
+    const t = synthAudioCtx.currentTime;
 
-    gain.gain.setValueAtTime(0.0001, synthAudioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.04, synthAudioCtx.currentTime + 0.08);
-    gain.gain.exponentialRampToValueAtTime(0.0001, synthAudioCtx.currentTime + 1.2);
+    // Nada fundamental utama (sine hangat)
+    const osc1 = synthAudioCtx.createOscillator();
+    const gain1 = synthAudioCtx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(freq, t);
 
-    osc.connect(gain);
-    gain.connect(synthAudioCtx.destination);
-    osc.start();
-    osc.stop(synthAudioCtx.currentTime + 1.25);
+    gain1.gain.setValueAtTime(0.0001, t);
+    gain1.gain.exponentialRampToValueAtTime(0.05, t + 0.05);
+    gain1.gain.exponentialRampToValueAtTime(0.0001, t + 1.4);
+
+    osc1.connect(gain1);
+    gain1.connect(synthAudioCtx.destination);
+    osc1.start(t);
+    osc1.stop(t + 1.45);
+
+    // Nada harmonik kedua (efek music box / bell chime manis)
+    const osc2 = synthAudioCtx.createOscillator();
+    const gain2 = synthAudioCtx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(freq * 2, t);
+
+    gain2.gain.setValueAtTime(0.0001, t);
+    gain2.gain.exponentialRampToValueAtTime(0.015, t + 0.04);
+    gain2.gain.exponentialRampToValueAtTime(0.0001, t + 0.85);
+
+    osc2.connect(gain2);
+    gain2.connect(synthAudioCtx.destination);
+    osc2.start(t);
+    osc2.stop(t + 0.9);
   } catch (e) { }
 }
 
